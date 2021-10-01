@@ -6,7 +6,7 @@ OBJS =	gem_com.o gem_equil.o gem_main.o gem_outd.o gem_fcnt.o gem_fft_wrapper.o 
 #DFFTPACK=/ccs/home/cycheng/git/dfftpack/libdfftpack.a
 #DFFTPACK=dfftpack/libdfftpack.a
 #DFFTPACK=/gpfs/alpine/world-shared/fus123/jycheng/software/dfftpack/libdfftpack.a
-DFFTPACK=/gpfs/wolf/world-shared/gen040/qiheng/nvhpc21.5/GEM_codes/SOFTWARE/dfftpack/libdfftpack.a
+DFFTPACK=/gpfs/wolf/world-shared/gen163/gem/qiheng/Software/dfftpack/libdfftpack.a
 LIBS = $(DFFTPACK)
 PLIB = gem_pputil.o
 
@@ -30,11 +30,11 @@ OPT = -fast -r8 -Kieee -llapack -lblas -cpp -Mbounds -Minfo=mp -mp#=gpu -gpu=cc7
 #OPT = -O0 -r8 -Kieee -llapack -lblas -g -cpp -Mbounds -Minfo=accel -acc -ta=nvidia:cc70
 F90 += $(COUPLING_OPT) $(XGC_3D_OUTPUT_OPT) $(EQUIL_OUTPUT_OPT) $(DEBUG_MAP_OPT) $(MAP_OPT) $(ADIOS2_OPT)
 
-ADIOS2_DIR ?=/gpfs/wolf/world-shared/gen040/qiheng/nvhpc21.5/GEM_codes/SOFTWARE/ADIOS2_install/adios2_bin
+ADIOS2_DIR ?=/gpfs/wolf/world-shared/gen163/gem/qiheng/Software/ADIOS_install
 ADIOS2_INC=$(shell $(ADIOS2_DIR)/bin/adios2-config --fortran-flags)
 ADIOS2_LIB=$(shell $(ADIOS2_DIR)/bin/adios2-config --fortran-libs --cxx-libs)
 
-PSPLINE_DIR ?= /gpfs/wolf/world-shared/gen040/qiheng/nvhpc21.5/GEM_codes/SOFTWARE/pspline-gpu
+PSPLINE_DIR ?=/gpfs/wolf/world-shared/gen163/gem/qiheng/Software/pspline-gpu
 PSPLINE_INC=-I$(PSPLINE_DIR)
 PSPLINE_LIB=-L$(PSPLINE_DIR)
 

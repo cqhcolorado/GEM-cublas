@@ -44,7 +44,6 @@ module gem_com
 
   character(len=70) outname
   REAL :: endtm,begtm,pstm
-  REAL :: starttm,lasttm,tottm
   real :: aux1(50000),aux2(20000)
   real,dimension(:),allocatable :: workx,worky,workz
   complex,dimension(:),allocatable :: tmpx
