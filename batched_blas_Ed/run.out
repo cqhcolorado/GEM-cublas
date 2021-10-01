@@ -1,0 +1,176 @@
+ n =          1024  batchCount =            64
+ ntimes =             5
+ time for LU took   0.3 sec    598.9 Gflops/sec
+ time for solve   0.2 sec   1182.6 Gflops/sec
+ max_abserr =    1.6088570540994271E-011
+ max_res =    6.4053753343772527E-012
+ time for LU took   0.3 sec    606.2 Gflops/sec
+ time for solve   0.2 sec   1182.3 Gflops/sec
+ max_abserr =    1.9999288986536839E-011
+ max_res =    6.4759948814700215E-012
+ time for LU took   0.3 sec    606.8 Gflops/sec
+ time for solve   0.2 sec   1183.3 Gflops/sec
+ max_abserr =    2.7741291199941191E-011
+ max_res =    6.0325931686734861E-012
+ time for LU took   0.3 sec    604.5 Gflops/sec
+ time for solve   0.2 sec   1181.9 Gflops/sec
+ max_abserr =    8.6807857159386543E-011
+ max_res =    6.4485126707809995E-012
+ time for LU took   0.3 sec    606.8 Gflops/sec
+ time for solve   0.2 sec   1181.3 Gflops/sec
+ max_abserr =    3.3419404561179081E-011
+ max_res =    6.7258601009264474E-012
+ n =          1024  batchCount =            64
+ ntimes =             5
+ time for LU took   0.3 sec    605.5 Gflops/sec
+ time for solve   0.2 sec   1174.1 Gflops/sec
+ max_abserr =    1.6088570540994271E-011
+ max_res =    6.4053753343772527E-012
+ time for LU took   0.3 sec    605.5 Gflops/sec
+ time for solve   0.2 sec   1175.5 Gflops/sec
+ max_abserr =    1.9999288986536839E-011
+ max_res =    6.4759948814700215E-012
+ time for LU took   0.3 sec    605.4 Gflops/sec
+ time for solve   0.2 sec   1175.6 Gflops/sec
+ max_abserr =    2.7741291199941191E-011
+ max_res =    6.0325931686734861E-012
+ time for LU took   0.3 sec    605.0 Gflops/sec
+ time for solve   0.2 sec   1174.8 Gflops/sec
+ max_abserr =    8.6807857159386543E-011
+ max_res =    6.4485126707809995E-012
+ time for LU took   0.3 sec    606.6 Gflops/sec
+ time for solve   0.2 sec   1179.2 Gflops/sec
+ max_abserr =    3.3419404561179081E-011
+ max_res =    6.7258601009264474E-012
+ n =          1024  batchCount =            64
+ ntimes =             5
+ time for LU took   0.3 sec    606.5 Gflops/sec
+ time for solve   0.2 sec   1177.5 Gflops/sec
+ max_abserr =    1.6088570540994271E-011
+ max_res =    6.4053753343772527E-012
+ time for LU took   0.3 sec    606.3 Gflops/sec
+ time for solve   0.2 sec   1178.9 Gflops/sec
+ max_abserr =    1.9999288986536839E-011
+ max_res =    6.4759948814700215E-012
+ time for LU took   0.3 sec    606.4 Gflops/sec
+ time for solve   0.2 sec   1177.8 Gflops/sec
+ max_abserr =    2.7741291199941191E-011
+ max_res =    6.0325931686734861E-012
+ time for LU took   0.3 sec    603.2 Gflops/sec
+ time for solve   0.2 sec   1177.6 Gflops/sec
+ max_abserr =    8.6807857159386543E-011
+ max_res =    6.4485126707809995E-012
+ time for LU took   0.3 sec    606.1 Gflops/sec
+ time for solve   0.2 sec   1177.8 Gflops/sec
+ max_abserr =    3.3419404561179081E-011
+ max_res =    6.7258601009264474E-012
+ n =          1024  batchCount =            64
+ ntimes =             5
+ time for LU took   0.3 sec    607.1 Gflops/sec
+ time for solve   0.2 sec   1180.0 Gflops/sec
+ max_abserr =    1.6088570540994271E-011
+ max_res =    6.4053753343772527E-012
+ time for LU took   0.3 sec    607.9 Gflops/sec
+ time for solve   0.2 sec   1180.4 Gflops/sec
+ max_abserr =    1.9999288986536839E-011
+ max_res =    6.4759948814700215E-012
+ time for LU took   0.3 sec    605.0 Gflops/sec
+ time for solve   0.2 sec   1179.2 Gflops/sec
+ max_abserr =    2.7741291199941191E-011
+ max_res =    6.0325931686734861E-012
+ time for LU took   0.3 sec    578.6 Gflops/sec
+ time for solve   0.2 sec   1175.3 Gflops/sec
+ max_abserr =    8.6807857159386543E-011
+ max_res =    6.4485126707809995E-012
+ time for LU took   0.3 sec    607.6 Gflops/sec
+ time for solve   0.2 sec   1179.3 Gflops/sec
+ max_abserr =    3.3419404561179081E-011
+ max_res =    6.7258601009264474E-012
+ n =          1024  batchCount =            64
+ ntimes =             5
+ time for LU took   0.3 sec    559.6 Gflops/sec
+ time for solve   0.3 sec   1029.5 Gflops/sec
+ max_abserr =    1.6088570540994271E-011
+ max_res =    6.4053753343772527E-012
+ time for LU took   0.3 sec    560.2 Gflops/sec
+ time for solve   0.3 sec   1030.0 Gflops/sec
+ max_abserr =    1.9999288986536839E-011
+ max_res =    6.4759948814700215E-012
+ time for LU took   0.3 sec    560.5 Gflops/sec
+ time for solve   0.3 sec   1030.2 Gflops/sec
+ max_abserr =    2.7741291199941191E-011
+ max_res =    6.0325931686734861E-012
+ time for LU took   0.3 sec    560.4 Gflops/sec
+ time for solve   0.3 sec   1029.5 Gflops/sec
+ max_abserr =    8.6807857159386543E-011
+ max_res =    6.4485126707809995E-012
+ time for LU took   0.3 sec    560.6 Gflops/sec
+ time for solve   0.3 sec   1029.6 Gflops/sec
+ max_abserr =    3.3419404561179081E-011
+ max_res =    6.7258601009264474E-012
+ n =          1024  batchCount =            64
+ ntimes =             5
+ time for LU took   0.3 sec    606.0 Gflops/sec
+ time for solve   0.2 sec   1179.0 Gflops/sec
+ max_abserr =    1.6088570540994271E-011
+ max_res =    6.4053753343772527E-012
+ time for LU took   0.3 sec    606.8 Gflops/sec
+ time for solve   0.2 sec   1180.1 Gflops/sec
+ max_abserr =    1.9999288986536839E-011
+ max_res =    6.4759948814700215E-012
+ time for LU took   0.3 sec    606.1 Gflops/sec
+ time for solve   0.2 sec   1178.0 Gflops/sec
+ max_abserr =    2.7741291199941191E-011
+ max_res =    6.0325931686734861E-012
+ time for LU took   0.3 sec    606.1 Gflops/sec
+ time for solve   0.2 sec   1180.7 Gflops/sec
+ max_abserr =    8.6807857159386543E-011
+ max_res =    6.4485126707809995E-012
+ time for LU took   0.3 sec    606.7 Gflops/sec
+ time for solve   0.2 sec   1181.0 Gflops/sec
+ max_abserr =    3.3419404561179081E-011
+ max_res =    6.7258601009264474E-012
+ n =          1024  batchCount =            64
+ ntimes =             5
+ time for LU took   0.3 sec    608.0 Gflops/sec
+ time for solve   0.2 sec   1180.7 Gflops/sec
+ max_abserr =    1.6088570540994271E-011
+ max_res =    6.4053753343772527E-012
+ time for LU took   0.3 sec    608.4 Gflops/sec
+ time for solve   0.2 sec   1182.5 Gflops/sec
+ max_abserr =    1.9999288986536839E-011
+ max_res =    6.4759948814700215E-012
+ time for LU took   0.3 sec    608.1 Gflops/sec
+ time for solve   0.2 sec   1182.1 Gflops/sec
+ max_abserr =    2.7741291199941191E-011
+ max_res =    6.0325931686734861E-012
+ time for LU took   0.3 sec    608.2 Gflops/sec
+ time for solve   0.2 sec   1182.1 Gflops/sec
+ max_abserr =    8.6807857159386543E-011
+ max_res =    6.4485126707809995E-012
+ time for LU took   0.3 sec    608.0 Gflops/sec
+ time for solve   0.2 sec   1181.4 Gflops/sec
+ max_abserr =    3.3419404561179081E-011
+ max_res =    6.7258601009264474E-012
+ n =          1024  batchCount =            64
+ ntimes =             5
+ time for LU took   0.3 sec    606.2 Gflops/sec
+ time for solve   0.2 sec   1175.0 Gflops/sec
+ max_abserr =    1.6088570540994271E-011
+ max_res =    6.4053753343772527E-012
+ time for LU took   0.3 sec    606.1 Gflops/sec
+ time for solve   0.2 sec   1177.2 Gflops/sec
+ max_abserr =    1.9999288986536839E-011
+ max_res =    6.4759948814700215E-012
+ time for LU took   0.3 sec    608.0 Gflops/sec
+ time for solve   0.2 sec   1176.4 Gflops/sec
+ max_abserr =    2.7741291199941191E-011
+ max_res =    6.0325931686734861E-012
+ time for LU took   0.3 sec    591.4 Gflops/sec
+ time for solve   0.2 sec   1177.5 Gflops/sec
+ max_abserr =    8.6807857159386543E-011
+ max_res =    6.4485126707809995E-012
+ time for LU took   0.3 sec    602.8 Gflops/sec
+ time for solve   0.2 sec   1177.9 Gflops/sec
+ max_abserr =    3.3419404561179081E-011
+ max_res =    6.7258601009264474E-012

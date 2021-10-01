@@ -1,0 +1,9 @@
+CXX=nvcc
+CXXFLAGS=  --debug
+F90=nvfortran
+
+FFLAGS_COMMON=-mp -Minfo=all  -UUSE_MAGMA -DUSE_CUBLAS
+FFLAGS_acc= -fast -acc -cuda -gpu=cc70 $(FFLAGS_COMMON)
+FFLAGS_omp= -fast -mp=gpu -cuda -gpu=cc70 $(FFLAGS_COMMON)
+FFLAGS=$(FFLAGS_acc) 
+LIBS= -llapack -lblas -lcublas
