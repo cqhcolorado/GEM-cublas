@@ -185,7 +185,11 @@ CONTAINS
 !    !$acc data present(s_displ,s_counts)
 !    !$acc serial
 
+! KM: empty omp target data regions are not standard
+! KM: I've added a check to preprocess this out
+#ifndef _CRAYFTN
    !$omp target data 
+#endif
     s_displ(0) = 0  
    !$omp target teams loop bind(thread) 
     DO i=1,nvp-1
@@ -194,7 +198,10 @@ CONTAINS
 !    !$acc end serial
 !    !$acc end data
    !$omp end target teams loop
+
+#ifndef _CRAYFTN
    !$omp end target data 
+#endif
 
 !    !$acc update host(s_counts,s_displ)
     !$omp target update from(s_counts,s_displ)
@@ -202,7 +209,9 @@ CONTAINS
     if(me==0)write(*,*)'after test pmove 1.3',mpi_wtime()
 
 !    !$acc data present(s_counts)
+#ifndef _CRAYFTN
    !$omp target data 
+#endif
     nsize=0
 !    !$acc loop gang vector reduction(+:nsize)
    !$omp target teams loop reduction(+:nsize)
@@ -211,7 +220,10 @@ CONTAINS
     enddo
 !    !$acc end data
    !$omp end target teams loop
+
+#ifndef _CRAYFTN
    !$omp end target data
+#endif
 
   call mpi_barrier(mpi_comm_world,ierr)
 

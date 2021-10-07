@@ -1,0 +1,4 @@
+libpspline.a
+*.o
+*.mod
+*.MOD

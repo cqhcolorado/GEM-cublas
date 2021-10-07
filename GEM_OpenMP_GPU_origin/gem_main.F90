@@ -167,14 +167,14 @@ if(myid==0)write(*,*)'after mapping'
     write(*,*) 'timestep = ',timestep
     write(*,*) 'ps time=',pstm,'tot time=',tottm
 
-    write(*,*),'exact_total_tm',exact_total_tm,'tottm',tottm,'accumulate_tot_tm',accumulate_tot_tm,'poisson_tot_tm',poisson_tot_tm,'field_tot_tm',field_tot_tm,&
+    write(*,*) 'exact_total_tm',exact_total_tm,'tottm',tottm,'accumulate_tot_tm',accumulate_tot_tm,'poisson_tot_tm',poisson_tot_tm,'field_tot_tm',field_tot_tm,&
              'diagnose_tot_tm',diagnose_tot_tm,'reporter_tot_tm',reporter_tot_tm,'push_tot_tm',push_tot_tm, 'ppush_tot_tm',ppush_tot_tm, &
              'cpush_tot_tm',cpush_tot_tm,'gird1_tot_tm',grid1_tot_tm,'ppush1_tot_tm',ppush1_tot_tm,&
               'cpush1_tot_tm',cpush1_tot_tm,'grid11_tot_tm',grid11_tot_tm,'poisson0_tot_tm',poisson0_tot_tm
-    write(*,*),'total_tm',total_tm,'ppush_tm',ppush_tm,'cpush_tm',cpush_tm,'grid1_tm',grid1_tm,'pmove_tm',pmove_tm,'poisson_tm',poisson_tm,'init_tm',init_tm,'load_tm',load_tm
+    write(*,*) 'total_tm',total_tm,'ppush_tm',ppush_tm,'cpush_tm',cpush_tm,'grid1_tm',grid1_tm,'pmove_tm',pmove_tm,'poisson_tm',poisson_tm,'init_tm',init_tm,'load_tm',load_tm
 
-    write(*,*),'right caculation'
-    write(*,*),'total_tm',total_tm,'poisson_tm',poisson_tm,'ppush_tm',ppush_tm,'cpush_tm',cpush_tm,'pmove_tm',pmove_tm,'grid1_tm',grid1_tm,'others',total_tm-poisson_tm-ppush_tm-cpush_tm-pmove_tm-grid1_tm 
+    write(*,*) 'right caculation'
+    write(*,*) 'total_tm',total_tm,'poisson_tm',poisson_tm,'ppush_tm',ppush_tm,'cpush_tm',cpush_tm,'pmove_tm',pmove_tm,'grid1_tm',grid1_tm,'others',total_tm-poisson_tm-ppush_tm-cpush_tm-pmove_tm-grid1_tm
       
   endif
   do i=0,last 
@@ -824,7 +824,7 @@ mm_of_ns = mm(ns)
      !  4 pt. avg. done explicitly for vectorization...
 !!$omp critical
 !!$acc loop seq
-!$omp loop bind(thread)
+!!$omp loop bind(thread)
      do l=1,lr(1)
         !
         xs=x2(m,ns)+rhox(1)*cos(real(l-1)*alpha) !rwx(1,l)*rhog
@@ -859,6 +859,7 @@ mm_of_ns = mm(ns)
         aparp = aparp+apar(i,j,k)
 #endif
      enddo
+!     !$omp end loop
 !!$omp end critical
      exp1 = exp1/real(lr(1))
      eyp = eyp/real(lr(1))
@@ -1323,7 +1324,7 @@ mm_of_ns = mm(ns)
      !endif
      !  4 pt. avg. written out explicitly for vectorization...
 !!$acc loop seq
-!$omp loop bind(thread)
+!!$omp loop bind(thread)
      do l=1,lr(1)
         
         !xs=x3(m,ns)+rhox(l) !rwx(1,l)*rhog
@@ -1858,6 +1859,7 @@ if(jump_opt==0)then
 !$omp private(wz0,wz1,wx0,wx1,grcgtp,bfldp,radiusp,qhatp,grp,gxdgyp,fp,psipp,rhox) &
 !$omp private(k,th,dbdrp,dbdtp,dydrp,jfnp,b,rhog,rhoy,wght,vpar,xs,yt,xt,j,r,i,alpha) &
 !$omp private(wk0,wi1,wi0,wj1,wj0,vfac,wk1,dv) &
+!$omp private(mm_of_ns) &
 !$omp reduction(+:myden)
 #endif
 #ifdef OPENACC
@@ -1960,7 +1962,7 @@ mm_of_ns=mm(ns)
         alpha=pi2/real(lr(1))
         !    now do 1,2,4 point average, where lr is the no. of points...
 !!$acc loop seq
-!$omp loop bind(thread)
+!!$omp loop bind(thread)
         do l=1,lr(1)
                          
            xs=x3(m,ns)+rhox(1)*cos(real(l-1)*alpha) !rwx(1,l)*rhog
@@ -2126,11 +2128,15 @@ else
   myupar = 0.
   if(idg.eq.1)write(*,*)'enter electron grid1'
 
+#ifdef OPENACC
 !$acc data copy(myupar(:,:,:),mydene)
 !$acc parallel
 !$acc loop gang vector
+#endif
+#ifdef OPENMP
 !$omp target data map(tofrom:myupar(:,:,:),mydene) map(to:w3e(1:mme),w111(1:mme),x3e(1:mme),z3e(1:mme),y3e(1:mme),u3e(1:mme),w011(1:mme),w001(1:mme),w101(1:mme),w000(1:mme),w100(1:mme),w010(1:mme),w110(1:mme))
-!$omp target teams loop
+!$omp target teams distribute parallel do simd
+#endif
   do m=1,mme
      dv=(dx*dy*dz)
      wght=w3e(m)/dv
@@ -2234,9 +2240,9 @@ else
 !     !$acc end atomic
      !$omp end atomic
   enddo
-!$acc end parallel
-!$acc end data
-!$omp end target teams loop
+!!$acc end parallel
+!!$acc end data
+!$omp end target teams distribute parallel do simd
 !$omp end target data
   if(idg.eq.1)write(*,*)'pass electron grid1'
   !   enforce periodicity
@@ -6302,9 +6308,13 @@ subroutine push_wrapper(n,ip)
   call generate_3d_field(ex,ex_3d)
   call generate_3d_field(ey,ey_3d)
   call generate_3d_field(ez,ez_3d)
+#ifdef OPENACC
   !$acc update device(ex_3d,ey_3d,ez_3d)
-  !$omp target update to(ex_3d,ey_3d,ez_3d)
   !$acc wait
+#endif
+#ifdef OPENMP
+  !$omp target update to(ex_3d,ey_3d,ez_3d)
+#endif
   call mpi_barrier(mpi_comm_world,ierr)
   if(myid==0)then
     write(gemout,*)'after generate 3d field'
@@ -6778,10 +6788,14 @@ subroutine setw(ip,n)
   real :: xt,yt,zt
 
   vte = sqrt(amie*t0e(nr/2))
+#ifdef OPENACC
 !$acc parallel
 !$acc loop gang vector 
+#endif
+#ifdef OPENMP
 !$omp target data map(from:w110(1:mme),w100(1:mme),w010(1:mme),w000(1:mme),w111(1:mme),w001(1:mme),w011(1:mme),w101(1:mme)) map(to:y3e(1:mme),z3e(1:mme),t0e(:),mue3(1:mme),bfld(:,:),thfnz(:),x3e(1:mme),u3e(1:mme))
 !$omp target teams loop
+#endif
   do m=1,mme
      r=x3e(m)-0.5*lx+lr0
 
@@ -6828,9 +6842,13 @@ subroutine setw(ip,n)
      w110(m)=wx1*wy1*wz0*wght
      w111(m)=wx1*wy1*wz1*wght
   end do
+#ifdef OPENACC
 !$acc end parallel
+#endif
+#ifdef OPENMP
 !$omp end target teams loop
 !$omp end target data
+#endif
   !      return
 end subroutine setw
 

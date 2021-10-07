@@ -7,8 +7,7 @@
 #  FFLAGS += -fPIC
 #  FFLAGS_LOW_OPT += -fPIC
 #endif
-FC=mpif90
-LD=mpif90
-FFLAGS= -fast
-FFLATS_LOW_OPT= -fast
-
+FC=ftn
+LD=ftn
+FFLAGS= -Ofast -homp
+FFLATS_LOW_OPT= -Ofast -homp

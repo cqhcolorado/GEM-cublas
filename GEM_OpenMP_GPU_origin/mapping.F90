@@ -2092,7 +2092,8 @@ subroutine init_1d_interpolation(spline,levelsin,data_in,nlevels,pbc)
   integer, dimension(2) :: BCS1
   integer :: ier
   integer :: nlevels
-  real, dimension(nlevels) :: levelsin, data_in
+  real, dimension(nlevels) :: levelsin
+  real(ezspline_r8), dimension(nlevels) :: data_in
   type(EZspline1_r8) :: spline
   logical :: pbc
 
@@ -2132,11 +2133,11 @@ real function interpol_spl_1d(inval,ideriv,spline)
     use EZspline_obj
     use EZspline
     implicit none
-    real, intent(in) :: inval
+    real(ezspline_r8), intent(in) :: inval
     integer, intent(in) :: ideriv
     type(EZspline1_r8), intent(in) :: spline
     integer :: ier
-    real :: r8value
+    real(ezspline_r8) :: r8value
 
     if (ideriv==0) then
       call EZspline_interp(spline,inval,r8value,ier)

@@ -1,0 +1,6 @@
+*.o
+*.mod
+*.MOD
+*.s
+*.lst
+gem_main

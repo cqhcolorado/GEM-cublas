@@ -178,7 +178,10 @@ subroutine gkps_adiabatic_electron(nstep,ip)
                       ! cz1 = exp(-IU*ikx*i*pi/imx)
                       theta = ikx*i*pi/imx
                       z1 = dcmplx( cos(theta), sin(theta) )
-                      cz1 = dconjg( z1 )
+                      ! dconjg requires the argument to be of kind=2. z1 is of type COMPLEX(kind=4)
+                      ! the conjg intrinsic should be used as it matches the kind
+!                      cz1 = dconjg( z1 )
+                      cz1 = conjg( z1 )
 
                       tmp=q(ns)*sin(ix*ikx*pi/imx)* &
                           ((1-gamb1(ns,ikx,j,i,k))*z1-&
