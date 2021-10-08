@@ -5726,7 +5726,7 @@ subroutine initialize
   flush(6)
 #endif
 
-call MPI_ALLREDUCE(dum,jacp,1,  &
+  call MPI_ALLREDUCE(dum,jacp,1,  &
        MPI_REAL8,MPI_SUM,           &
        tube_comm,ierr)
 
@@ -5767,6 +5767,7 @@ call MPI_ALLREDUCE(dum,jacp,1,  &
      
 #ifdef my_debug
   write(6,*) "KM | sr initialize | before ALLREDUCE ", __FILE__, __LINE__ 
+  write(6,*) "KM | sr initialize | jacp: ", jacp 
   flush(6)
 #endif 
      call MPI_ALLREDUCE(dum,jacp,1,  &
@@ -5778,6 +5779,7 @@ call MPI_ALLREDUCE(dum,jacp,1,  &
      endif
 #ifdef my_debug
   write(6,*) "KM | sr initialize | after  ALLREDUCE ", __FILE__, __LINE__ 
+  write(6,*) "KM | sr initialize | jacp: ", jacp 
   flush(6)
 #endif 
 #ifdef my_debug
@@ -5786,6 +5788,7 @@ call MPI_ALLREDUCE(dum,jacp,1,  &
 #endif 
      vol(k) = dx*ly*dz*jacp    
   end do
+
   call weight
   !     initialize particle quantities...
   if( cut.eq.0.) cut=1.

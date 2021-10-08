@@ -18,6 +18,7 @@ ADIOS2_OPT := -DADIOS2
 OPENMP_OL_OPT := -DOPENMP_OL
 #OPENACC_OPT := -DOPENACC
 F90 = ftn
+# if you want loop-marks that show what the compielr is doing, add -hlist=a as an option
 OPT = -homp -O0
 #F90 += $(COUPLING_OPT) $(XGC_3D_OUTPUT_OPT) $(EQUIL_OUTPUT_OPT) $(DEBUG_MAP_OPT) $(MAP_OPT) $(ADIOS2_OPT) $(OPENMP_OPT)
 OPT += $(COUPLING_OPT) $(XGC_3D_OUTPUT_OPT) $(EQUIL_OUTPUT_OPT) $(DEBUG_MAP_OPT) $(MAP_OPT) $(ADIOS2_OPT) $(OPENMP_OL_OPT)
