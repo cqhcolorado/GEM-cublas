@@ -412,11 +412,3 @@ contains
     endif
   end subroutine split_indices
 end module omp_module
-
-
-
-
-
-
-
-

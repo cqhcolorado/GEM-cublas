@@ -40,10 +40,9 @@ subroutine pushe(icycle,irk,ncycle)
     dte_cycle=0.5*dte/real(ncycle)
     if(icycle==1)then
       !save data
-#ifdef OPENACC
+#if  defined OPENACC
       !$acc update host(x2e,y2e,z2e,u2e,w2e,mue2,index,ipass,xie,z0e,eke,pze,u0e,pif0e,w5e,w0e)
-#endif
-#ifdef OPENMP
+#elif defined OPENMP_OL
       !$omp target update from(x2e,y2e,z2e,u2e,w2e,mue2,index,ipass,xie,z0e,eke,pze,u0e,pif0e,w5e,w0e)
 #endif
       mme_tmp=mme
@@ -90,10 +89,9 @@ subroutine pushe(icycle,irk,ncycle)
       pif0e=pif0e0
       w5e=w5e0
       w0e=w0e00
-#ifdef OPENACC
+#if defined OPENACC
       !$acc update device(x2e,y2e,z2e,u2e,w2e,mue2,index,ipass,xie,z0e,eke,pze,u0e,pif0e,w5e,w0e)
-#endif
-#ifdef OPENMP
+#elif defined OPENMP_OL
      !$omp target update to(x2e,y2e,z2e,u2e,w2e,mue2,index,ipass,xie,z0e,eke,pze,u0e,pif0e,w5e,w0e)
 #endif
       if(myid==0)then
@@ -109,10 +107,9 @@ subroutine pushe(icycle,irk,ncycle)
   myavptch = 0.
   myaven = 0.
   pidum = 1./(pi*2)**1.5*(vwidthe)**3
-#ifdef OPENACC
+#if defined OPENACC
   !$acc parallel loop gang vector
-#endif
-#ifdef OPENMP
+#elif defined OPENMP_OL
   !$omp target data map(tofrom:w2e(1:mme),u3e(1:mme),mue3(1:mme),z3e(1:mme),z2e(1:mme),x2e(1:mme),w3e(1:mme),y3e(1:mme),x3e(1:mme),y2e(1:mme),u2e(1:mme)) map(to:zeff(:),mue2(1:mme),jfn(:),ex(:,:,0:1),psip(:),capne(:),phincp(:),grdgt(:,:),grcgt(:,:),capte(:),f(:),dipdr(:),bdcrvb(:,:),dbdr(:,:),t0e(:),curvbz(:,:),gr(:,:),qhat(:,:),psip2(:),ez(:,:,0:1),psi(:),sf(:),bfld(:,:),nue0(:),dbdth(:,:),thfnz(:),dydr(:,:),ey(:,:,0:1),radius(:,:))
 !  !$omp target teams loop
   !$omp target teams distribute parallel do simd
@@ -391,10 +388,9 @@ subroutine pushe(icycle,irk,ncycle)
      w2e(m)=w3e(m)
 
   end do
-#ifdef OPENACC
+#if defined OPENACC
   !$acc end parallel
-#endif
-#ifdef OPENMP
+#elif defined OPENMP_OL
   !$omp end target teams distribute parallel do simd
   !$omp end target data
 #endif
@@ -575,8 +571,10 @@ subroutine pushe_rk4_1step(icycle,irk,ncycle)
     dte_cycle=0.5*dte/real(ncycle)
     if(icycle==1)then
       !save data
-#ifdef OPENACC
+#if defined OPENACC
       !$acc update host(x2e,y2e,z2e,u2e,w2e,mue2,index,ipass,xie,z0e,eke,pze,u0e,pif0e,w5e,w0e)
+#elif defined OPENMP_OL
+        ! should there be an omp target update here?
 #endif
       mme_tmp=mme
       x0e=x2e
@@ -623,8 +621,10 @@ subroutine pushe_rk4_1step(icycle,irk,ncycle)
       w5e=w5e0
       w0e=w0e00
 
-#ifdef OPENACC
+#if defined OPENACC
       !$acc update device(x2e,y2e,z2e,u2e,w2e,mue2,index,ipass,xie,z0e,eke,pze,u0e,pif0e,w5e,w0e)
+#elif defined OPENMP_OL
+        ! should there be an omp target update here?
 #endif
       if(myid==0)then
        write(gemout,*)'restore data'
@@ -639,8 +639,10 @@ subroutine pushe_rk4_1step(icycle,irk,ncycle)
   myavptch = 0.
   myaven = 0.
   pidum = 1./(pi*2)**1.5*(vwidthe)**3
-#ifdef OPENACC
+#if defined OPENACC
   !$acc parallel loop gang vector
+#elif defined OPENMP_OL
+        ! should there be an omp target region here?
 #endif
   do m=1,mme
 
@@ -1335,8 +1337,10 @@ subroutine pushe_rk4_1step(icycle,irk,ncycle)
      w2e(m)=w3e(m)
 
   end do
-#ifdef OPENACC
+#if defined OPENACC
   !$acc end parallel
+#elif defined OPENMP_OL
+   ! corresponding omp end target 
 #endif
   call MPI_ALLREDUCE(myopz,nopz,1,MPI_integer, &
        MPI_SUM, MPI_COMM_WORLD,ierr)
@@ -1485,8 +1489,10 @@ subroutine update_electron_weight
   real :: pif0e_tmp(mme)
   
 
-#ifdef OPENACC
+#if defined OPENACC
   !$acc parallel loop gang vector
+#elif defined OPENMP_OL
+   ! analogous omp region?
 #endif
   do m=1,mme
 
@@ -1551,8 +1557,10 @@ subroutine update_electron_weight
      w5e(m)=w4
      
   enddo
-#ifdef OPENACC
+#if defined OPENACC
   !$acc end parallel
+#elif defined OPENMP_OL
+! analogous omp end?
 #endif
 
   init=1

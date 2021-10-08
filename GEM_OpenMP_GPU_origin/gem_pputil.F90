@@ -5,6 +5,9 @@ MODULE gem_pputil
 !  use fft_wrapper
 #ifdef OPENACC
   use openacc
+#elif defined OPENMP_OL
+  ! if using openmp API calls
+  !use omp_lib
 #endif
   use mpi
   IMPLICIT NONE
@@ -137,16 +140,20 @@ CONTAINS
 !    !$acc parallel present(xp,iz_arr)
 !    !$acc loop gang vector
 
+#ifdef OPENMP_OL
    !$omp target data map(to:xp(1:np))
    !$omp target teams loop
+#endif
     do ip=1,np
        iz_arr(ip)= INT(MODULO(xp(ip), lz)/dzz)    !!! Assume periodicity
 !        iz_arr(ip)= INT(MODU(xp(ip), lz)/dzz)    !!! Assume periodicity
     enddo
 !    !$acc end parallel
 !    !$acc wait
+#ifdef OPENMP_OL
     !$omp end target teams loop
     !$omp end target data
+#endif
 
 
 !    !$acc update host(iz_arr(1:np))

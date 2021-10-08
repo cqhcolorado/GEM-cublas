@@ -1,5 +1,7 @@
 !       3D Flux Tube Toroidal Electromagnetic GK Delta-f Code
 !   global variables...
+#define my_debug
+
 program gem_main
 
   use gem_com
@@ -654,8 +656,11 @@ subroutine init
      write(*,*) 'lxa min = ', ly*q0/(2*pi*r0*q0p)/a
      write(*,*) 't0i(nr/2)= ', t0i(nr/2)
      write(*,*) 'Gyrokrs = ', 2*pi*sqrt(mims(1))*sqrt(t0e(nr/2))/ly/bunit
+     write(6,*) 'ly    = ', ly
+     write(6,*) 'bunit = ', bunit
   end if
   close(115)
+  flush(6)
 !!$acc update device(jfn,radius,t0s,tgis,dbdr,gr,bdcrvb,qhat,f,grdgt,capts,grcgt,dydr,gxdgy,phincp,sf,capns,bfld,xn0s,vparsp,thfnz,psip,psip2,curvbz,dipdr,dbdth)
 !$omp target update to(jfn,radius,t0s,tgis,dbdr,gr,bdcrvb,qhat,f,grdgt,capts,grcgt,dydr,gxdgy,phincp,sf,capns,bfld,xn0s,vparsp,thfnz,psip,psip2,curvbz,dipdr,dbdth)
   !      return
@@ -669,6 +674,9 @@ subroutine init
   nthreads = 1
 #endif
 if(myid==0)write(*,*)'omp_num_threads=',nthreads
+#ifdef my_debug
+  flush(6)
+#endif 
 end subroutine init
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -734,6 +742,14 @@ ppush1_start_tm=ppush1_start_tm+MPI_WTIME()
 mm_of_ns = mm(ns)
 !$omp target data map(to:psi(:))
 !$omp target teams loop private(rhox,rhoy) thread_limit(128)
+!!$omp target teams distribution parallel do private(rhox,rhoy)
+  do m=1,mm_of_ns
+#elif defined OPENMP_OL
+ppush1_start_tm=ppush1_start_tm+MPI_WTIME()
+!!$omp target data map(to:pif0(:,ns),psi(:),mm(ns)) map(tofrom:w2(:,ns),z3(:,ns),z2(:,ns),x2(:,ns),u3(:,ns),x3(:,ns),y3(:,ns),w5(:,ns),w3(:,ns))
+mm_of_ns = mm(ns)
+!$omp target data map(to:psi(:))
+!$omp target teams distribute parallel do simd private(rhox,rhoy) thread_limit(128)
 !!$omp target teams distribution parallel do private(rhox,rhoy)
   do m=1,mm_of_ns
 #else
@@ -1032,6 +1048,16 @@ ppush1_end_tm=ppush1_end_tm+MPI_WTIME()
 !  write(9,*)'OpenMP_runtime_ppush= ',openmp_runtime_ppush
 !  close(9)
 !endif
+#elif defined OPENMP_OL
+!$omp end target teams distribute parallel do simd 
+!$omp end target data
+ppush1_end_tm=ppush1_end_tm+MPI_WTIME()
+!openmp_runtime_ppush=mpi_wtime() - start_time_ppush
+!if(myid.eq.master)then
+!  open(9, file='plot',status='unknown',position='append')
+!  write(9,*)'OpenMP_runtime_ppush= ',openmp_runtime_ppush
+!  close(9)
+!endif
 #endif
 
   call mpi_barrier(mpi_comm_world,ierr)
@@ -1160,7 +1186,10 @@ subroutine cpush(n,ns)
   use gem_com
   use gem_equil
 #ifdef OPENACC
-  use openacc
+!  use openacc
+#elif OPENMP_OL
+! use the openmp module if using openMP API calls
+  !use omp_lib
 #endif
 #ifdef COUPLING
   use coupling_core_edge,only:rhomax
@@ -1233,6 +1262,13 @@ cpush1_start_tm=cpush1_start_tm+MPI_WTIME()
 mm_of_ns = mm(ns)
 !$omp target data map(to:psi(:)) map(tofrom:mypfl_es(:),y3(:,ns),w2(:,ns),mypfl_em(:),mynos,myefl_em(:),myavewi,myefl_es(:),myke)
 !$omp target teams loop private(rhox,rhoy) thread_limit(128)
+#elif defined OPENMP_OL
+cpush1_start_tm=cpush1_start_tm+MPI_WTIME()
+!start_time_cpush = mpi_wtime()
+!!$omp target data map(to:w0(:,ns),mm(ns),psi(:),ez(:,:,0:1),pif0(:,ns),ey(:,:,0:1),ex(:,:,0:1),mu(:,ns)) map(tofrom:w3(:,ns),y2(:,ns),x2(:,ns),z3(:,ns),z2(:,ns),x3(:,ns),u2(:,ns),u3(:,ns),w5(:,ns),mypfl_es(:),y3(:,ns),w2(:,ns),mypfl_em(:),mynos,myefl_em(:),myavewi,myefl_es(:),myke)
+mm_of_ns = mm(ns)
+!$omp target data map(to:psi(:)) map(tofrom:mypfl_es(:),y3(:,ns),w2(:,ns),mypfl_em(:),mynos,myefl_em(:),myavewi,myefl_es(:),myke)
+!$omp target teams distribute parallel do simd private(rhox,rhoy) thread_limit(128)
 #endif
   do m=1,mm_of_ns
 !     start_time_cpush = mpi_wtime()
@@ -1602,6 +1638,17 @@ cpush1_end_tm=cpush1_end_tm+MPI_WTIME()
 !write(9,*)'OpenMP_runtime_cpush= ',openmp_runtime_cpush
 !close(9)
 !endif
+#elif defined OPENMP_OL
+!$omp end target teams distribute parallel do simd 
+!$omp end target data
+cpush1_end_tm=cpush1_end_tm+MPI_WTIME()
+!openmp_runtime_cpush=mpi_wtime() - start_time_cpush
+
+!if(myid.eq.master)then
+!open(9, file='plot',status='unknown',position='append')
+!write(9,*)'OpenMP_runtime_cpush= ',openmp_runtime_cpush
+!close(9)
+!endif
 #endif
 #ifdef OPENMP
 !$omp end parallel do
@@ -1871,6 +1918,13 @@ grid11_start_tm=grid11_start_tm+MPI_WTIME()
 mm_of_ns=mm(ns)
 !$omp target data map(to:w3e(1:mme),w111(1:mme),x3e(1:mme),z3e(1:mme),y3e(1:mme),u3e(1:mme),w011(1:mme),w001(1:mme),w101(1:mme),w000(1:mme),w100(1:mme),w010(1:mme),w110(1:mme)) map(tofrom:myden(:,:,:),mydene(:,:,:),myupar(:,:,:))
 !$omp target teams loop private(rhox,rhoy) thread_limit(128)
+#elif defined OPENMP_OL
+!start_time_grid1 = mpi_wtime()
+grid11_start_tm=grid11_start_tm+MPI_WTIME()
+!!$omp target data map(to:mm(ns),z3(:,ns),y3(:,ns),w3(:,ns),mu(:,ns),x3(:,ns),w3e(1:mme),w111(1:mme),x3e(1:mme),z3e(1:mme),y3e(1:mme),u3e(1:mme),w011(1:mme),w001(1:mme),w101(1:mme),w000(1:mme),w100(1:mme),w010(1:mme),w110(1:mme)) map(tofrom:myden(:,:,:),mydene(:,:,:),myupar(:,:,:))
+mm_of_ns=mm(ns)
+!$omp target data map(to:w3e(1:mme),w111(1:mme),x3e(1:mme),z3e(1:mme),y3e(1:mme),u3e(1:mme),w011(1:mme),w001(1:mme),w101(1:mme),w000(1:mme),w100(1:mme),w010(1:mme),w110(1:mme)) map(tofrom:myden(:,:,:),mydene(:,:,:),myupar(:,:,:))
+!$omp target teams distribute parallel do simd private(rhox,rhoy) thread_limit(128)
 #endif
      do m=1,mm_of_ns
 !        start_time_grid1 = mpi_wtime()
@@ -2062,13 +2116,28 @@ grid11_end_tm=grid11_end_tm+MPI_WTIME()
 !write(9,*)'OpenMP_runtime_grid1= ',openmp_runtime_grid1
 !close(9)
 !endif
-#endif
+#elif defined OPENMP_OL
+!$omp end target teams distribute parallel do simd 
+!$omp end target data
+grid11_end_tm=grid11_end_tm+MPI_WTIME()
+!openmp_runtime_grid1=mpi_wtime() - start_time_grid1
+
+!if(myid.eq.master)then
+!open(9, file='plot',status='unknown',position='append')
+!write(9,*)'OpenMP_runtime_grid1= ',openmp_runtime_grid1
+!close(9)
+!endif
 !$omp target update from(myden)
+#endif
 
      !write(*,*)'before coupling, myid=',myid,'gx_id=',gx_id
      !myden(229:260,:,:)=0.0
      !myden(0:31,:,:)=0.0
      if(idg.eq.1)write(*,*)myid,'pass ion grid1'
+#ifdef my_debug
+     write(6,*) "KM Before MPI_Barrier ", __FILE__," " ,__LINE__
+     flush(6)
+#endif
      call MPI_BARRIER(MPI_COMM_WORLD,ierr)
      !write(*,*)'before coupling 1, myid=',myid,'gx_id=',gx_id
      !   enforce periodicity
@@ -2132,8 +2201,7 @@ else
 !$acc data copy(myupar(:,:,:),mydene)
 !$acc parallel
 !$acc loop gang vector
-#endif
-#ifdef OPENMP
+#elif defined OPENMP_OL
 !$omp target data map(tofrom:myupar(:,:,:),mydene) map(to:w3e(1:mme),w111(1:mme),x3e(1:mme),z3e(1:mme),y3e(1:mme),u3e(1:mme),w011(1:mme),w001(1:mme),w101(1:mme),w000(1:mme),w100(1:mme),w010(1:mme),w110(1:mme))
 !$omp target teams distribute parallel do simd
 #endif
@@ -3316,12 +3384,22 @@ subroutine filter(u)
         enddo
      enddo
 
+#ifdef my_debug 
+     write(6,*) "#KM | 0 | ", __FILE__, __LINE__ , " ierr: ", ierr
+     flush(6)
+#endif
+
      call MPI_SENDRECV(rbfs(0:imx-1,0:jmx-1),imx*jmx, &
           MPI_REAL8,rngbr,9, &
           lbfr(0:imx-1,0:jmx-1),imx*jmx, &
           MPI_REAL8,lngbr,9,  &
           TUBE_COMM,stat,ierr)
 
+#ifdef my_debug 
+     write(6,*) "#KM | 1 | ", __FILE__, __LINE__ , " ierr: ", ierr
+     flush(6)
+#endif
+     
      call MPI_SENDRECV(lbfs(0:imx-1,0:jmx-1),imx*jmx, &
           MPI_REAL8,lngbr,8,  &
           rbfr(0:imx-1,0:jmx-1),imx*jmx,  &
@@ -5624,6 +5702,10 @@ subroutine initialize
   integer :: n,i,j,k,ip,ierr
 
   call init
+#ifdef my_debug
+  write(6,*) "KM | sr initialize | Before MPI_Barrier ", __FILE__," " ,__LINE__
+  flush(6)
+#endif
   call mpi_barrier(mpi_comm_world,ierr)
   if(myid==0)write(*,*)'cn0s=',cn0s
   dum = 0.
@@ -5638,13 +5720,30 @@ subroutine initialize
      dum = dum+(jac(i,0)+jac(i+1,0)+jac(i,1)+jac(i+1,1))/4
      dum1 = dum1+xndum*(jac(i,0)+jac(i+1,0)+jac(i,1)+jac(i+1,1))/4
   end do
-  call MPI_ALLREDUCE(dum,jacp,1,  &
+
+#ifdef my_debug
+  write(6,*) "KM | sr initialize | Before MPI_ALLREDUCE ", __FILE__," " ,__LINE__
+  flush(6)
+#endif
+
+call MPI_ALLREDUCE(dum,jacp,1,  &
        MPI_REAL8,MPI_SUM,           &
        tube_comm,ierr)
 
   call MPI_ALLREDUCE(dum1,dum2,1,  &
        MPI_REAL8,MPI_SUM,           &
        tube_comm,ierr)
+
+#ifdef my_debug
+  write(6,*) "KM | sr initialize | After MPI_ALLREDUCE ", __FILE__," " ,__LINE__
+  flush(6)
+  if (.not. allocated(vol))then
+    write(6,*) "vol is NOT allocated. Allocating now"
+    allocate(vol(nsubd))
+  else
+    write(6,*) "vol was allocated"
+  endif
+#endif
 
   totvol = dx*ly*dz*jacp    
   n0=real(tmm(1))/totvol*real(numprocs)
@@ -5665,9 +5764,26 @@ subroutine initialize
         wx1 = 1.-wx0
         dum = dum+(jac(i,0)+jac(i+1,0)+jac(i,1)+jac(i+1,1))/4
      end do
+     
+#ifdef my_debug
+  write(6,*) "KM | sr initialize | before ALLREDUCE ", __FILE__, __LINE__ 
+  flush(6)
+#endif 
      call MPI_ALLREDUCE(dum,jacp,1,  &
           MPI_REAL8,MPI_SUM,           &
           tube_comm,ierr)
+     if(ierr .ne. MPI_SUCCESS) then
+       write(6,*) "KM | sr initialize | ierr =  ",ierr, " - " , __FILE__," " ,__LINE__
+       flush(6)
+     endif
+#ifdef my_debug
+  write(6,*) "KM | sr initialize | after  ALLREDUCE ", __FILE__, __LINE__ 
+  flush(6)
+#endif 
+#ifdef my_debug
+  write(6,*) "KM | sr initialize | dx,ly,dz,jacp :  ", dx, ly,dz, jacp
+  flush(6)
+#endif 
      vol(k) = dx*ly*dz*jacp    
   end do
   call weight
@@ -5686,6 +5802,10 @@ subroutine initialize
   call blendf
   call mpi_barrier(mpi_comm_world,ierr)
   if(myid==0)write(*,*)'after blendf'
+#ifdef my_debug
+  write(6,*) "KM | sr initialize | END of SR ", __FILE__," " ,__LINE__
+  flush(6)
+#endif 
 end subroutine initialize
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine loader_wrapper
@@ -6311,8 +6431,7 @@ subroutine push_wrapper(n,ip)
 #ifdef OPENACC
   !$acc update device(ex_3d,ey_3d,ez_3d)
   !$acc wait
-#endif
-#ifdef OPENMP
+#elif defined OPENMP_OL
   !$omp target update to(ex_3d,ey_3d,ez_3d)
 #endif
   call mpi_barrier(mpi_comm_world,ierr)
@@ -6791,8 +6910,7 @@ subroutine setw(ip,n)
 #ifdef OPENACC
 !$acc parallel
 !$acc loop gang vector 
-#endif
-#ifdef OPENMP
+#elif defined OPENMP_OL
 !$omp target data map(from:w110(1:mme),w100(1:mme),w010(1:mme),w000(1:mme),w111(1:mme),w001(1:mme),w011(1:mme),w101(1:mme)) map(to:y3e(1:mme),z3e(1:mme),t0e(:),mue3(1:mme),bfld(:,:),thfnz(:),x3e(1:mme),u3e(1:mme))
 !$omp target teams loop
 #endif
@@ -6844,8 +6962,7 @@ subroutine setw(ip,n)
   end do
 #ifdef OPENACC
 !$acc end parallel
-#endif
-#ifdef OPENMP
+#elif defined OPENMP_OL
 !$omp end target teams loop
 !$omp end target data
 #endif
