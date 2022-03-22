@@ -2308,10 +2308,13 @@ else
 !     !$acc end atomic
      !$omp end atomic
   enddo
-!!$acc end parallel
-!!$acc end data
+#ifdef OPENACC  
+!$acc end parallel
+!$acc end data
+#elif defined OPENMP_OL
 !$omp end target teams distribute parallel do simd
 !$omp end target data
+#endif
   if(idg.eq.1)write(*,*)'pass electron grid1'
   !   enforce periodicity
   call enforce(mydene(:,:,:))
