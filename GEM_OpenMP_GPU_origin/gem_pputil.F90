@@ -5,9 +5,6 @@ MODULE gem_pputil
 !  use fft_wrapper
 #ifdef OPENACC
   use openacc
-#elif defined OPENMP_OL
-  ! if using openmp API calls
-  !use omp_lib
 #endif
   use mpi
   IMPLICIT NONE
@@ -140,20 +137,16 @@ CONTAINS
 !    !$acc parallel present(xp,iz_arr)
 !    !$acc loop gang vector
 
-#ifdef OPENMP_OL
    !$omp target data map(to:xp(1:np))
    !$omp target teams loop
-#endif
     do ip=1,np
        iz_arr(ip)= INT(MODULO(xp(ip), lz)/dzz)    !!! Assume periodicity
 !        iz_arr(ip)= INT(MODU(xp(ip), lz)/dzz)    !!! Assume periodicity
     enddo
 !    !$acc end parallel
 !    !$acc wait
-#ifdef OPENMP_OL
     !$omp end target teams loop
     !$omp end target data
-#endif
 
 
 !    !$acc update host(iz_arr(1:np))
@@ -192,11 +185,7 @@ CONTAINS
 !    !$acc data present(s_displ,s_counts)
 !    !$acc serial
 
-! KM: empty omp target data regions are not standard
-! KM: I've added a check to preprocess this out
-#ifndef _CRAYFTN
    !$omp target data 
-#endif
     s_displ(0) = 0  
    !$omp target teams loop bind(thread) 
     DO i=1,nvp-1
@@ -205,10 +194,7 @@ CONTAINS
 !    !$acc end serial
 !    !$acc end data
    !$omp end target teams loop
-
-#ifndef _CRAYFTN
    !$omp end target data 
-#endif
 
 !    !$acc update host(s_counts,s_displ)
     !$omp target update from(s_counts,s_displ)
@@ -216,9 +202,7 @@ CONTAINS
     if(me==0)write(*,*)'after test pmove 1.3',mpi_wtime()
 
 !    !$acc data present(s_counts)
-#ifndef _CRAYFTN
    !$omp target data 
-#endif
     nsize=0
 !    !$acc loop gang vector reduction(+:nsize)
    !$omp target teams loop reduction(+:nsize)
@@ -227,10 +211,7 @@ CONTAINS
     enddo
 !    !$acc end data
    !$omp end target teams loop
-
-#ifndef _CRAYFTN
    !$omp end target data
-#endif
 
   call mpi_barrier(mpi_comm_world,ierr)
 
